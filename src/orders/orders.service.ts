@@ -4,9 +4,9 @@ import { PrismaClient } from '@prisma/client';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { ChangeOrderStatusDto, OrderItemDto } from './dto';
-import { PRODUCT_SERVICE } from 'src/config/services';
 import { firstValueFrom } from 'rxjs';
 import { ProductItem } from 'src/common/types';
+import { NATS_SERVICE } from 'src/config/services';
 
 
 @Injectable()
@@ -17,7 +17,7 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
 
 
   constructor(
-    @Inject(PRODUCT_SERVICE) private readonly productsClient: ClientProxy,
+    @Inject(NATS_SERVICE) private readonly client: ClientProxy,
   ) {
     super();
   }
@@ -35,7 +35,7 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
 
       // verifyProducts
       const verifiedProducts: ProductItem[] = await firstValueFrom(
-        this.productsClient.send({ cmd: 'validate_products' },
+        this.client.send({ cmd: 'validate_products' },
           createOrderDto.items.map(p => p.productId)
         ))
       this.logger.log(verifiedProducts);
@@ -145,7 +145,7 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
     const productIds = order.OrderItem.map((orderItem) => orderItem.productId);
     // using the retrieved product ids, we can now fetch the product details from the products microservice.
     const products: ProductItem[] = await firstValueFrom(
-      this.productsClient.send({ cmd: 'validate_products' }, productIds),
+      this.client.send({ cmd: 'validate_products' }, productIds),
     );
 
     // maps order items with product details
