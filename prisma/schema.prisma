@@ -6,12 +6,15 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets   = ["linux-musl", "native", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x",  "debian-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+
 
 enum OrderStatus {
   PENDING
