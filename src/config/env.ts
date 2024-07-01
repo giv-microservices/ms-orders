@@ -9,7 +9,7 @@ interface EnvConfig {
 
 const envsSchema = joi
   .object({
-    PORT: joi.number().default(3000),
+    PORT: joi.number(),
     DATABASE_URL: joi.string().required(),
     NATS_SERVERS: joi.array().items(joi.string()).required(),
   })

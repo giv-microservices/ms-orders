@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets   = ["linux-musl", "native", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x",  "debian-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["linux-musl", "native", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -15,32 +15,49 @@ datasource db {
 }
 
 
-
 enum OrderStatus {
   PENDING
+  PAID
   DELIVERED
   CANCELLED
 }
 
 model Order {
-  id          String      @id @default(uuid())
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  status      OrderStatus @default(PENDING)
-  paid        Boolean     @default(false)
-  paidAt      DateTime?
+  id          String @id @default(uuid())
   totalAmount Float
   totalItems  Int
-  OrderItem   OrderItem[]
+
+  status         OrderStatus @default(PENDING)
+  paid           Boolean     @default(false)
+  paidAt         DateTime?
+  stripeChargeId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  OrderItem    OrderItem[]
+  OrderReceipt OrderReceipt?
 }
 
 model OrderItem {
-  id        String   @id @default(uuid())
+  id        String @id @default(uuid())
   productId Int
   quantity  Int
   price     Float
-  Order     Order?   @relation(fields: [orderId], references: [id])
-  orderId   String?
+
+  Order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+}
+
+model OrderReceipt {
+  id String @id @default(uuid())
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String @unique
+
+  receiptUrl String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 }
