@@ -4,6 +4,9 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+
+// IMPORTANT!: if there a schema change firts do the prima migrate in the micho services, then use docker-compose
+
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["linux-musl", "native", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
