@@ -1,4 +1,4 @@
-import { Controller, ParseUUIDPipe} from '@nestjs/common';
+import { Controller, Logger, ParseUUIDPipe} from '@nestjs/common';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -9,12 +9,15 @@ import { PaidOrderDto } from './dto/paid-order.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  ordersLogger = new Logger('Microservice Orders');
 
   @MessagePattern({ cmd: 'create_order' })
   async create(@Payload() createOrderDto: CreateOrderDto) {;
-    const order = await this.ordersService.create(createOrderDto);
-    const paymentSession = await this.ordersService.createPaymentSession(order)
 
+    const order = await this.ordersService.create(createOrderDto);
+    this.ordersLogger.log(`Order created: ${JSON.stringify(order)}`);
+    const paymentSession = await this.ordersService.createPaymentSession(order)
+    this.ordersLogger.log(`Payment Session created`, paymentSession);
     return {
       order,
       paymentSession,
